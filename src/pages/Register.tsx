@@ -32,7 +32,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   
-  const { register } = useAuth();
+  const { register, fetchUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -68,7 +68,12 @@ const Register = () => {
         title: 'Account created!',
         description: 'Welcome to MediApp. Your account has been created successfully.',
       });
-      navigate('/dashboard');
+      try {
+        await fetchUser();
+      } catch (err) {
+        console.warn('fetchUser failed after register', err);
+      }
+      navigate('/');
     } catch (error) {
       toast({
         title: 'Registration failed',

@@ -5,6 +5,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  fetchUser: () => Promise<void>;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterPatientData) => Promise<void>;
   logout: () => void;
@@ -24,32 +25,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // NOTE: temporarily skip fetching `/users/me` to allow the app to proceed
+  // immediately after signin. Authentication state is derived from token
+  // presence while the user profile may be fetched/created later.
   const fetchUser = useCallback(async () => {
     try {
       const userData = await usersApi.getProfile();
+      console.debug('fetchUser -> received user:', userData);
       setUser(userData);
     } catch (error) {
-      console.error('Failed to fetch user:', error);
-      clearTokens();
+      console.error('Failed to fetch user (ignored for now):', error);
+      // do not clear tokens here — let the app proceed with token-based auth
       setUser(null);
     }
   }, []);
 
   useEffect(() => {
     const initAuth = async () => {
-      const { accessToken } = getTokens();
-      if (accessToken) {
-        await fetchUser();
-      }
+      // Do not call fetchUser during init — rely on tokens for auth gating
       setIsLoading(false);
     };
     initAuth();
-  }, [fetchUser]);
+  }, []);
 
   const login = async (credentials: LoginCredentials) => {
     const response = await authApi.login(credentials);
+    console.debug('login response:', response);
+    if (!response || !response.accessToken) {
+      throw new Error('Login response did not include an access token');
+    }
+    // Save tokens and do NOT fetch the user profile now — allow app to proceed.
     setTokens(response.accessToken, response.refreshToken);
-    await fetchUser();
+    setUser(null);
   };
 
   const register = async (data: RegisterPatientData) => {
@@ -63,12 +70,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const tokens = getTokens();
+  const isAuthenticated = !!user || !!tokens.accessToken;
+
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated,
         isLoading,
+        fetchUser,
         login,
         register,
         logout,

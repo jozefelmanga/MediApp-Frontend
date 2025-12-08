@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { doctorsApi, bookingsApi, Doctor, AvailabilitySlot } from '@/lib/api';
+import { doctorsApi, bookingsApi, usersApi, Doctor, AvailabilitySlot } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
@@ -30,8 +30,6 @@ const mockDoctor: Doctor = {
   specialtyName: 'Cardiology',
   medicalLicenseNumber: 'MED-12345',
   officeAddress: '123 Heart Care Center, Suite 100, New York, NY 10001',
-  rating: 4.9,
-  reviewCount: 127,
 };
 
 const generateMockSlots = (date: Date): AvailabilitySlot[] => {
@@ -61,7 +59,7 @@ const generateMockSlots = (date: Date): AvailabilitySlot[] => {
 const DoctorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, fetchUser } = useAuth();
   const { toast } = useToast();
 
   const [doctor, setDoctor] = useState<Doctor | null>(null);
@@ -118,13 +116,33 @@ const DoctorDetail = () => {
       return;
     }
 
-    if (!selectedSlot || !user || !doctor) return;
+    if (!selectedSlot || !doctor) return;
+
+    // Ensure we have a user profile (some flows allow token-only auth)
+    let currentUser = user;
+    if (!currentUser) {
+      try {
+        // Try to fetch profile directly
+        currentUser = await usersApi.getProfile();
+        // update context as well if possible
+        try {
+          await fetchUser();
+        } catch {}
+      } catch (err) {
+        toast({
+          title: 'Profile required',
+          description: 'Please load your profile before booking (Load profile from dashboard).',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
 
     setIsBooking(true);
     try {
       const startTime = new Date(selectedSlot.startTime);
       await bookingsApi.book({
-        patientId: user.userId,
+        patientId: currentUser.userId,
         doctorId: doctor.doctorId,
         slotId: selectedSlot.slotId,
         appointmentDate: format(startTime, 'yyyy-MM-dd'),
@@ -192,7 +210,7 @@ const DoctorDetail = () => {
             <div className="bg-card rounded-xl border border-border p-6 sticky top-24">
               <div className="text-center mb-6">
                 <div className="h-24 w-24 mx-auto rounded-2xl bg-gradient-primary flex items-center justify-center text-primary-foreground text-3xl font-bold mb-4">
-                  {doctor.firstName[0]}{doctor.lastName[0]}
+                  {((doctor.firstName && doctor.firstName[0]) || '?')}{((doctor.lastName && doctor.lastName[0]) || '?')}
                 </div>
                 <h1 className="font-display text-2xl font-bold text-foreground">
                   Dr. {doctor.firstName} {doctor.lastName}
@@ -201,14 +219,6 @@ const DoctorDetail = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <Star className="h-5 w-5 fill-warning text-warning" />
-                  <div>
-                    <p className="font-semibold text-foreground">{doctor.rating?.toFixed(1) || 'N/A'}</p>
-                    <p className="text-xs text-muted-foreground">{doctor.reviewCount} reviews</p>
-                  </div>
-                </div>
-
                 <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
                   <MapPin className="h-5 w-5 text-primary mt-0.5" />
                   <div>

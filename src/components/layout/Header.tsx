@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -20,16 +20,51 @@ import {
   ChevronDown 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { notificationsApi } from '@/lib/api';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    let mounted = true;
+    const loadUnread = async () => {
+      try {
+        if (user) {
+          const res = await notificationsApi.getUnreadCount(user.userId);
+          if (mounted) setUnreadCount(res?.count || 0);
+        } else {
+          if (mounted) setUnreadCount(0);
+        }
+      } catch (err) {
+        console.error('Failed to load unread count', err);
+      }
+    };
+
+    loadUnread();
+
+    const handler = (e: any) => {
+      try {
+        const count = typeof e.detail === 'number' ? e.detail : Number(e.detail || 0);
+        setUnreadCount(Number.isFinite(count) ? count : 0);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+
+    window.addEventListener('notifications:unread', handler as EventListener);
+    return () => {
+      mounted = false;
+      window.removeEventListener('notifications:unread', handler as EventListener);
+    };
+  }, [user]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
@@ -70,11 +105,19 @@ export const Header = () => {
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => navigate('/notifications')}
+                aria-label="Notifications"
+              >
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent text-[10px] font-bold text-accent-foreground flex items-center justify-center">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-accent text-[10px] font-bold text-accent-foreground flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : String(unreadCount)}
+                  </span>
+                )}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -165,6 +208,13 @@ export const Header = () => {
           <div className="h-px bg-border my-2" />
           {isAuthenticated ? (
             <>
+              <Link 
+                to="/notifications"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Notifications
+              </Link>
               <Link 
                 to="/dashboard" 
                 className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"

@@ -71,3 +71,12 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Gateway / API Configuration
+
+- **Env vars**: Create a `.env` file in the project root (or set environment variables) using the example in `.env.example`.
+  - `VITE_GATEWAY_URL` — the API Gateway root (e.g. `http://localhost:8550`).
+  - Optionally `VITE_API_BASE_URL` — full base including `/api/v1`.
+- Restart the dev server after changing env vars: `npm run dev`.
+
+This app expects the Gateway routes described in `MediApp_Gateway_Collection.json` (under the project root). The frontend will call endpoints under `/api/v1/*` by default and uses `Authorization: Bearer <token>` for authenticated requests.

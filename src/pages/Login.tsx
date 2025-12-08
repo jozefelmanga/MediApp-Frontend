@@ -20,7 +20,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
-  const { login } = useAuth();
+  const { login, fetchUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,7 +47,14 @@ const Login = () => {
         title: 'Welcome back!',
         description: 'You have successfully signed in.',
       });
-      navigate('/dashboard');
+      // Try to fetch the user profile in background and then return to home
+      try {
+        await fetchUser();
+      } catch (err) {
+        // ignore profile load errors; user can load profile from Dashboard
+        console.warn('fetchUser failed after login', err);
+      }
+      navigate('/');
     } catch (error) {
       toast({
         title: 'Sign in failed',
@@ -155,8 +162,8 @@ const Login = () => {
           <div className="bg-muted/50 rounded-xl p-4 border border-border">
             <p className="text-xs text-muted-foreground text-center mb-2">Demo credentials:</p>
             <div className="text-xs text-center space-y-1">
-              <p><span className="font-medium">Patient:</span> patient@example.com / Password123</p>
-              <p><span className="font-medium">Admin:</span> admin@mediapp.com / Admin123</p>
+              <p><span className="font-medium">Patient:</span> patient@mediapp.com / Patient123</p>
+              <p><span className="font-medium">Admin:</span> admin@mediapp.local / ChangeMe123!</p>
             </div>
           </div>
         </div>

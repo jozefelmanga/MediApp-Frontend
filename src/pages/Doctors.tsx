@@ -33,8 +33,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'Cardiology',
     medicalLicenseNumber: 'MED-12345',
     officeAddress: '123 Heart Care Center, Suite 100',
-    rating: 4.9,
-    reviewCount: 127,
   },
   {
     doctorId: 2,
@@ -46,8 +44,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'Neurology',
     medicalLicenseNumber: 'MED-23456',
     officeAddress: '456 Brain & Spine Institute',
-    rating: 4.8,
-    reviewCount: 98,
   },
   {
     doctorId: 3,
@@ -59,8 +55,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'Pediatrics',
     medicalLicenseNumber: 'MED-34567',
     officeAddress: '789 Children\'s Health Plaza',
-    rating: 4.95,
-    reviewCount: 215,
   },
   {
     doctorId: 4,
@@ -72,8 +66,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'Dermatology',
     medicalLicenseNumber: 'MED-45678',
     officeAddress: '321 Skin Care Clinic',
-    rating: 4.7,
-    reviewCount: 89,
   },
   {
     doctorId: 5,
@@ -85,8 +77,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'Orthopedics',
     medicalLicenseNumber: 'MED-56789',
     officeAddress: '654 Joint & Bone Center',
-    rating: 4.85,
-    reviewCount: 156,
   },
   {
     doctorId: 6,
@@ -98,8 +88,6 @@ const mockDoctors: Doctor[] = [
     specialtyName: 'General Medicine',
     medicalLicenseNumber: 'MED-67890',
     officeAddress: '987 Family Health Clinic',
-    rating: 4.75,
-    reviewCount: 203,
   },
 ];
 
@@ -241,22 +229,14 @@ const Doctors = () => {
                 >
                   <div className="flex items-start gap-4">
                     <div className="h-16 w-16 rounded-xl bg-gradient-primary flex items-center justify-center text-primary-foreground text-xl font-bold flex-shrink-0">
-                      {doctor.firstName[0]}{doctor.lastName[0]}
+                      {((doctor.firstName && doctor.firstName[0]) || '?')}{((doctor.lastName && doctor.lastName[0]) || '?')}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-                        Dr. {doctor.firstName} {doctor.lastName}
+                        Dr. {doctor.firstName || 'Unknown'} {doctor.lastName || ''}
                       </h3>
-                      <p className="text-sm text-primary font-medium">{doctor.specialtyName}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="h-4 w-4 fill-warning text-warning" />
-                        <span className="text-sm font-medium text-foreground">
-                          {doctor.rating?.toFixed(1) || 'N/A'}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          ({doctor.reviewCount || 0} reviews)
-                        </span>
-                      </div>
+                      <p className="text-sm text-primary font-medium">{doctor.specialtyName || '—'}</p>
+                      {/* rating & reviews removed — backend returns only basic doctor info */}
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-border">
