@@ -63,9 +63,9 @@ The project includes UI screenshots used in the original documentation. To displ
 
 Images (example markdown — will render if files exist):
 
-![Homepage screenshot](/screenshots/screenshot-1.png)
-![Search & results](/screenshots/screenshot-2.png)
-![Doctor detail / availability](/screenshots/screenshot-3.png)
-![Booking confirmation](/screenshots/screenshot-4.png)
+![Login](/readme pictures/mediapp (1).png)
+![Availability](//readme pictures/mediapp (2).png)
+![Doctors](/readme pictures/mediapp (3).png)
+![Welcom](/readme pictures/mediapp (4).png)
 
 
