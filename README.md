@@ -59,10 +59,15 @@ The collection contains ready-to-run workflows and sets variables such as `acces
 
 ## Screenshots
 
-![Login](./readme_pictures/mediapp_1.png)
-![Availability](./readme_pictures/mediapp_2.png)
-![Doctors](./readme_pictures/mediapp_3.png)
-![Welcome](./readme_pictures/mediapp_4.png)
+## Screenshots
+
+| Login | Availability |
+|-------|--------------|
+| ![Login](./readme_pictures/mediapp_1.png) | ![Availability](./readme_pictures/mediapp_2.png) |
+
+| Doctors | Welcome |
+|---------|---------|
+| ![Doctors](./readme_pictures/mediapp_3.png) | ![Welcome](./readme_pictures/mediapp_4.png) |
 
 
 
