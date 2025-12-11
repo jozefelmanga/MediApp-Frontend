@@ -87,6 +87,14 @@ export const Header = () => {
           >
             Find Doctors
           </Link>
+          {user?.role === 'ADMIN' && (
+            <Link
+              to="/admin"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Admin
+            </Link>
+          )}
           <Link 
             to="/specialties" 
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

@@ -7,6 +7,11 @@ const GATEWAY_URL =
 // Prefer explicit full base when provided. Otherwise default to a relative
 // `/api/v1` so Vite dev server can proxy requests and avoid CORS.
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ?? "/api/v1";
+// Admin token used by some admin-only endpoints (can be provided via env or stored in localStorage)
+const ADMIN_TOKEN =
+  (import.meta as any).env?.VITE_ADMIN_TOKEN ||
+  localStorage.getItem("admin_token") ||
+  "change-me";
 
 // Auth state management
 let accessToken: string | null = null;
@@ -219,6 +224,15 @@ export const usersApi = {
       body: JSON.stringify(data),
     }),
 
+  registerDoctor: (data: any) =>
+    apiRequest<{ data: { userId: number } }>("/users/register/doctor", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "X-Admin-Token": ADMIN_TOKEN,
+      },
+    }),
+
   getProfile: async () => {
     const res = await apiRequest<any>("/users/me");
     return res && res.data ? (res.data as User) : (res as User);
@@ -227,6 +241,57 @@ export const usersApi = {
   getUserDetails: async (userId: number) => {
     const res = await apiRequest<any>(`/users/details/${userId}`);
     return res && res.data ? (res.data as User) : (res as User);
+  },
+
+  getAllPatients: async (page = 0, size = 50) => {
+    const res = await apiRequest<any>(
+      `/users/all/patients?page=${page}&size=${size}`
+    );
+    if (!res) return [] as User[];
+    // Normalize paginated or raw shapes into an array of users
+    let items: any[] = [];
+    if (Array.isArray(res)) items = res;
+    else if (res.data && Array.isArray(res.data)) items = res.data;
+    else if (res.data && res.data.content && Array.isArray(res.data.content))
+      items = res.data.content;
+    else if (res.content && Array.isArray(res.content)) items = res.content;
+
+    const mapped: User[] = (items || []).map((it) => ({
+      userId: it.userId ?? it.patientId ?? it.id,
+      email: it.email,
+      firstName: it.firstName,
+      lastName: it.lastName,
+      phoneNumber: it.phoneNumber,
+      dateOfBirth: it.dateOfBirth,
+      role: it.role ?? "PATIENT",
+    }));
+
+    return mapped;
+  },
+
+  getAllDoctors: async (page = 0, size = 50) => {
+    const res = await apiRequest<any>(
+      `/users/all/doctors?page=${page}&size=${size}`
+    );
+    if (!res) return [] as User[];
+    let items: any[] = [];
+    if (Array.isArray(res)) items = res;
+    else if (res.data && Array.isArray(res.data)) items = res.data;
+    else if (res.data && res.data.content && Array.isArray(res.data.content))
+      items = res.data.content;
+    else if (res.content && Array.isArray(res.content)) items = res.content;
+
+    const mapped: User[] = (items || []).map((it) => ({
+      userId: it.userId ?? it.doctorId ?? it.id,
+      email: it.email,
+      firstName: it.firstName,
+      lastName: it.lastName,
+      phoneNumber: it.phoneNumber,
+      dateOfBirth: it.dateOfBirth,
+      role: it.role ?? "DOCTOR",
+    }));
+
+    return mapped;
   },
 };
 
@@ -279,6 +344,17 @@ export const doctorsApi = {
   releaseSlot: (slotId: number) =>
     apiRequest(`/doctors/availability/${slotId}/release`, {
       method: "PUT",
+    }),
+
+  createProfile: (data: {
+    userId: number;
+    medicalLicenseNumber: string;
+    specialtyId: number;
+    officeAddress: string;
+  }) =>
+    apiRequest(`/doctors/profiles`, {
+      method: "POST",
+      body: JSON.stringify(data),
     }),
 };
 
