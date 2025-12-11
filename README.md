@@ -63,9 +63,10 @@ The project includes UI screenshots used in the original documentation. To displ
 
 Images (example markdown — will render if files exist):
 
-![Login](/readme pictures/mediapp (1).png)
-![Availability](//readme pictures/mediapp (2).png)
-![Doctors](/readme pictures/mediapp (3).png)
-![Welcom](/readme pictures/mediapp (4).png)
+![Login](./readme_pictures/mediapp_1.png)
+![Availability](./readme_pictures/mediapp_2.png)
+![Doctors](./readme_pictures/mediapp_3.png)
+![Welcome](./readme_pictures/mediapp_4.png)
+
 
 
