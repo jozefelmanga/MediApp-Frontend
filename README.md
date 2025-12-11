@@ -59,10 +59,6 @@ The collection contains ready-to-run workflows and sets variables such as `acces
 
 ## Screenshots
 
-The project includes UI screenshots used in the original documentation. To display them in this README, put your images in `public/screenshots/` and name them `screenshot-1.png` … `screenshot-4.png` (or update paths below).
-
-Images (example markdown — will render if files exist):
-
 ![Login](./readme_pictures/mediapp_1.png)
 ![Availability](./readme_pictures/mediapp_2.png)
 ![Doctors](./readme_pictures/mediapp_3.png)
