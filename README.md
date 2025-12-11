@@ -59,8 +59,6 @@ The collection contains ready-to-run workflows and sets variables such as `acces
 
 ## Screenshots
 
-## Screenshots
-
 | Login | Availability |
 |-------|--------------|
 | ![Login](./readme_pictures/mediapp_1.png) | ![Availability](./readme_pictures/mediapp_2.png) |
