@@ -1,82 +1,71 @@
-# Welcome to your Lovable project
+# MediApp Frontend — React + Vite
 
-## Project info
+This repository contains the frontend application for the MediApp medical appointment booking system. It is implemented with React + Vite and provides the UI for patients to search doctors, view availability, and book appointments. The backend microservices are part of the separate backend repository — see the "Backend" section below.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Tech Summary (frontend)
 
-## How can I edit this code?
+- Framework: React (Vite)
+- Language: TypeScript
+- UI: shadcn-ui + Tailwind CSS
+- Dev server: Vite
 
-There are several ways of editing your application.
+Contributors:
 
-**Use Lovable**
+- Youssef Ben Salem
+- Seifeddine Boudoukhane
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Local Setup (frontend only)
 
-Changes made via Lovable will be committed automatically to this repo.
+Prerequisites:
 
-**Use your preferred IDE**
+- Node.js (recommend LTS) and `npm`
+- Access to the running backend Gateway (or local mock) — Gateway base URL used by the frontend is set via `VITE_GATEWAY_URL`
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Quick start:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# install deps
+npm install
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# run dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Environment variables:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Create a `.env` file in the frontend root (same folder as this `README.md`). Example:
 
-**Use GitHub Codespaces**
+```
+VITE_GATEWAY_URL=http://localhost:8550
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Restart the dev server after changing env vars.
 
-## What technologies are used for this project?
+## Backend (where to run the API and microservices)
 
-This project is built with:
+This repository is frontend-only. To run the backend microservices (Gateway, Security, User, Doctor, Booking, Notification, Discovery), see the Backend repository:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Backend repo: https://github.com/jozefelmanga/MediApp-Backend
 
-## How can I deploy this project?
+The frontend expects the Gateway to expose `/api/v1/*` endpoints and to accept `Authorization: Bearer <token>` for protected routes.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Postman collection
 
-## Can I connect a custom domain to my Lovable project?
+Import the Postman collection from the Backend repo to test APIs end-to-end:
 
-Yes, you can!
+- `postman/MediApp_Gateway_Collection.json` in https://github.com/jozefelmanga/MediApp-Backend
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The collection contains ready-to-run workflows and sets variables such as `access_token`, `patient_id`, `doctor_id`, and `appointment_id` during runs.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Screenshots
 
-## Gateway / API Configuration
+The project includes UI screenshots used in the original documentation. To display them in this README, put your images in `public/screenshots/` and name them `screenshot-1.png` … `screenshot-4.png` (or update paths below).
 
-- **Env vars**: Create a `.env` file in the project root (or set environment variables) using the example in `.env.example`.
-  - `VITE_GATEWAY_URL` — the API Gateway root (e.g. `http://localhost:8550`).
-  - Optionally `VITE_API_BASE_URL` — full base including `/api/v1`.
-- Restart the dev server after changing env vars: `npm run dev`.
+Images (example markdown — will render if files exist):
 
-This app expects the Gateway routes described in `MediApp_Gateway_Collection.json` (under the project root). The frontend will call endpoints under `/api/v1/*` by default and uses `Authorization: Bearer <token>` for authenticated requests.
+![Homepage screenshot](/screenshots/screenshot-1.png)
+![Search & results](/screenshots/screenshot-2.png)
+![Doctor detail / availability](/screenshots/screenshot-3.png)
+![Booking confirmation](/screenshots/screenshot-4.png)
+
+
